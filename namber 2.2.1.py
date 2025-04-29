@@ -1,5 +1,4 @@
-
-class Student(object):
+class Student:
 
     def __init__(self, surname = "Нет Фамилии", data = "нет даты рождения", numberG = "нет номера группы",listg = "Нет листа оценок"):
         self.surname = surname
