@@ -6,8 +6,6 @@ def comparator(nums):
         return False
     else:
         return True
-
-
 # наше множество чисел в массиве
 nums = [1,2,3,4,5,1]
 nums1 = [1,2,3,4,5,6]
