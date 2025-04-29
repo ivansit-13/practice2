@@ -4,7 +4,7 @@
 # демонстрирующую все возможности класса;
 
 class Train:
-    def __init__(self,name = "Поезд Томск-Белый_Яр",number = "643",time = "Нет времени отправления"):
+    def __init__(self,name = "Нет названия пункта назначения",number = "Нет номера поезда",time = "Нет времени отправления"):
         self.name = name
         self.number = number
         self.time = time
@@ -14,5 +14,19 @@ class Train:
         print(f"Номера поезда: {self.number}")
         print(f"Времени отправления: {self.time}")
 
-Train1
-Train2
+Train1 = Train("Томск-Белый_Яр",643,"17:45")
+Train2 = Train("Томск-Красноярск",6233,"21:45")
+Train3 = Train("Томск-Новокузнецк",1423,"1:00")
+mas = [Train1,Train2,Train3]
+print("\n","______________","\n")
+Train1.info()
+print("\n","______________","\n")
+Train2.info()
+print("\n","______________","\n")
+Train3.info()
+print("\n","______________","\n")
+exitprogram = int(input("Если 1 - то вы хотите редактировать, иначе 0 - "))
+while exitprogram != 0:
+    a = int(input("Введите номер поезда "))
+    for i in range(len(mas)):
+        if
