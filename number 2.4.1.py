@@ -25,7 +25,7 @@ dbStudent = sqlite3.connect("StudentsOfEmpire.db")
 sql_dbStudent = dbStudent.cursor()
 
 class Student:
-    def __init__(self, name = "НЕТИМЕНИ!", surname = "НЕТФАМИЛИИ", patronymic = "НЕТОТЧЕСТВА", group = "НЕТГРУППЫ", evaluations = "НЕТОЦЕНОК"):
+    def __init__(self, name, surname, patronymic, group, evaluations):
         self.name = name
         self.surname = surname
         self.patronymic = patronymic
@@ -92,7 +92,7 @@ while exit_code != 0:
         for i in sql_dbStudent.execute("SELECT * FROM student"):
             print(i)
     elif choice == 3:
-        surname = input("Введите фамилию студента для поиска: ")
+        surname = input("Введите фамилию студента для редакции: ")
         sql_dbStudent.execute("SELECT * FROM student WHERE surname = ?", (surname,))
         student_data = sql_dbStudent.fetchone()
         if student_data:
@@ -106,9 +106,37 @@ while exit_code != 0:
         else:
             print("Студент с такой фамилией не найден.")
     elif choice == 4:
-        pass
+        surname = input("Введите фамилию студента для редакции: ")
+        sql_dbStudent.execute("SELECT * FROM student WHERE surname = ?", (surname,))
+        student_data = sql_dbStudent.fetchone()
+        if student_data:
+            name, surname, patronymic, group, evaluations = student_data
+            new_name = input("Введите новое Имя Студента: ")
+            new_surname = input("Введите новую Фамилию Студента: ")
+            new_patronymic = input("Введите новое Отчество Студента: ")
+            new_group = input("Введите новую Группу Студента: ")
+            new_evaluations = []
+            for i in range(4):
+                grade = int(input(f"Введите новую оценку {i + 1}: "))
+                new_evaluations.append(grade)
+            Student1 = Student(new_name, new_surname, new_patronymic, new_group, str(new_evaluations))
+            sql_dbStudent.execute("UPDATE student SET name = ? WHERE name = ?",(Student1.info_name(),name))
+            sql_dbStudent.execute("UPDATE student SET surname = ? WHERE surname = ?", (Student1.info_surname(),surname))
+            sql_dbStudent.execute("UPDATE student SET patronymic = ? WHERE patronymic = ?", (Student1.info_patronymic(),patronymic))
+            sql_dbStudent.execute("UPDATE student SET 'group' = ? WHERE 'group' = ?", (Student1.info_group(),group))
+            sql_dbStudent.execute("UPDATE student SET evaluations = ? WHERE evaluations = ?", (Student1.info_evaluations(),evaluations))
+            # Фиксируем изменения (сохраняем добавление).
+            dbStudent.commit()
+        else:
+            print("Студент с такой фамилией не найден.")
     elif choice == 5:
-        pass
+        surname = input("Введите фамилию студента для УДАЛЕНИЯ)- ")
+        sql_dbStudent.execute("SELECT * FROM student WHERE surname = ?", (surname,))
+        student_data = sql_dbStudent.fetchone()
+        if student_data:
+            sql_dbStudent.execute("DELETE FROM student WHERE surname=?",(surname,))
+        else:
+            print("Студент с такой фамилией не найден.")
     elif choice == 6:
         pass
 
