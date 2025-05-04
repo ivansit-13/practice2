@@ -140,7 +140,7 @@ while exit_code != 0:
         dbStudent.commit()
     elif choice == 6:
         group = input("Введите группу студентов для узнания ср.бала: ")
-        # Используйте параметры запроса для защиты от SQL-инъекций
+        # Используйте параметры запроса для защиты от SQL-инъекций и у мменя тут была проблема с \"group\"
         sql_dbStudent.execute("SELECT evaluations FROM student WHERE \"group\" = ?", (group,))
         evaluations_mas = sql_dbStudent.fetchall()
 
