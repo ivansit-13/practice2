@@ -56,7 +56,7 @@ sql_dbStudent.execute(""" CREATE TABLE IF NOT EXISTS student (
 dbStudent.commit()
 
 # ЭТО ДЛЯ ВЫХОДА И ВХОДА В ПРОГРАММУ
-print("Здравствуйте в Базе данных студентов:","\n","Правила:","\n",
+print("_Здравствуйте в Базе данных студентов_","\n","Правила:","\n",
       1, "- начать работу", "\n",
       0, "- выход","\n")
 exit_code = int(input("Вы выбрали: "))
@@ -68,18 +68,43 @@ while exit_code != 0:
           4, "- РЕДАКТИРЫВАНИЕ СТУДЕНТА", "\n",
           5, "- УДАЛЕНИЕ СТУДЕНТА", "\n",
           6, "- ПРОСМОТР КОНКРЕТНЫХ СТУДЕНТОВ ОПРЕДЕЛЁННОЙ ГРУППЫ", "\n",
-          412, "- ПОСХАЛОЧКА", "\n",
           0, "- выход", "\n")
     choice = int(input("Вы выбрали: "))
     if choice == 1:
-        # Создаем экземпляр класса Student с дефолтными значениями.
-        Student1 = Student()
+        name = input("Введите Имя Студента: ")
+        surname = input("Введите Фамилию Студента: ")
+        patronymic = input("Введите Отчество Студента: ")
+        group = input("Введите Группу Студента: ")
+        evaluations = []
+        for i in range(4):
+            grade = int(input(f"Введите оценку {i + 1}: "))
+            evaluations.append(grade)
+        Student1 = Student(name,surname,patronymic,group,str(evaluations))
+        sql_dbStudent.fetchone()
+        # Используем параметризованный запрос (знаки вопроса), чтобы избежать SQL-инъекций.
+        sql_dbStudent.execute(f"INSERT INTO student VALUES (?, ?, ?, ?, ?)", (
+        Student1.info_name(), Student1.info_surname(), Student1.info_patronymic(), Student1.info_group(),
+        Student1.info_evaluations()))
+        # Фиксируем изменения (сохраняем добавление).
+        dbStudent.commit()
     elif choice == 2:
         # Выводим данные таблицы.
         for i in sql_dbStudent.execute("SELECT * FROM student"):
             print(i)
     elif choice == 3:
-        pass
+        surname = input("Введите фамилию студента для поиска: ")
+        sql_dbStudent.execute("SELECT * FROM student WHERE surname = ?", (surname,))
+        student_data = sql_dbStudent.fetchone()
+        if student_data:
+            name, surname, patronymic, group, evaluations_str = student_data
+            # strip удаляет [], а split разбивает строку на список подстрок, используя указанный разделитель
+            evaluations = [int(i) for i in evaluations_str.strip("[]").split(", ")]  # Преобразование строки в список
+            average_grade = sum(evaluations) / len(evaluations)
+            print("Информация о студенте:", name, surname, patronymic, "Группы: ", group)
+            print("Его оценки: ", evaluations)
+            print("Средний балл: ", average_grade)
+        else:
+            print("Студент с такой фамилией не найден.")
     elif choice == 4:
         pass
     elif choice == 5:
@@ -87,22 +112,9 @@ while exit_code != 0:
     elif choice == 6:
         pass
 
-    # Если запрос вернул None (пустой результат), значит, таблица пуста.
-    sql_dbStudent.fetchone()
-    # Добавляем нового студента с дефолтными значениями в таблицу.
-    # Используем параметризованный запрос (знаки вопроса), чтобы избежать SQL-инъекций.
-    sql_dbStudent.execute(f"INSERT INTO student VALUES (?, ?, ?, ?, ?)",(Student1.info_name(),Student1.info_surname(),Student1.info_patronymic(),Student1.info_group(),Student1.info_evaluations()))
-    # Фиксируем изменения (сохраняем добавление).
-    dbStudent.commit()
-
-    # Выводим данные таблицы.
-    for i in sql_dbStudent.execute("SELECT * FROM student"):
-        print(i)
-
-
     # ЭТО ДЛЯ ВЫХОДА И ПРОДОЛЖЕНИЯ РАБОТЫ С ПРОГРАММОЙ, ДА Я ЗАБЫЛ ОТЖАТЬ CAPS_LOOK
-    print("Здравствуйте в Базе данных студентов:", "\n", "Правила:", "\n",
-          1, "- начать работу", "\n",
+    print("Вы не забыли о своих возможностях?", "\n", "Правила:", "\n",
+          1, "- вы хотите продолжить? ", "\n",
           0, "- выход", "\n")
     exit_code = int(input("Вы выбрали: "))
 
