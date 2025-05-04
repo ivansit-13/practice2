@@ -67,7 +67,7 @@ while exit_code != 0:
           3, "- ПРОСМОТР 1 СТУДЕНТА ВКЛЮЧАЯ ЕГО СР.БАЛ", "\n",
           4, "- РЕДАКТИРЫВАНИЕ СТУДЕНТА", "\n",
           5, "- УДАЛЕНИЕ СТУДЕНТА", "\n",
-          6, "- ПРОСМОТР КОНКРЕТНЫХ СТУДЕНТОВ ОПРЕДЕЛЁННОЙ ГРУППЫ", "\n",
+          6, "- ПРОСМОТР  СР.БАЛ КОНКРЕТНЫХ СТУДЕНТОВ ОПРЕДЕЛЁННОЙ ГРУППЫ", "\n",
           0, "- выход", "\n")
     choice = int(input("Вы выбрали: "))
     if choice == 1:
@@ -92,7 +92,7 @@ while exit_code != 0:
         for i in sql_dbStudent.execute("SELECT * FROM student"):
             print(i)
     elif choice == 3:
-        surname = input("Введите фамилию студента для редакции: ")
+        surname = input("Введите фамилию студента для поиска: ")
         sql_dbStudent.execute("SELECT * FROM student WHERE surname = ?", (surname,))
         student_data = sql_dbStudent.fetchone()
         if student_data:
@@ -137,8 +137,26 @@ while exit_code != 0:
             sql_dbStudent.execute("DELETE FROM student WHERE surname=?",(surname,))
         else:
             print("Студент с такой фамилией не найден.")
+        dbStudent.commit()
     elif choice == 6:
-        pass
+        group = input("Введите группу студентов для узнания ср.бала: ")
+        # Используйте параметры запроса для защиты от SQL-инъекций
+        sql_dbStudent.execute("SELECT evaluations FROM student WHERE \"group\" = ?", (group,))
+        evaluations_mas = sql_dbStudent.fetchall()
+
+        if evaluations_mas:
+            counter = 0
+            counter_student = 0
+            for evaluations_tuple in evaluations_mas:
+                evaluations_str = evaluations_tuple[0]
+                evaluations = [int(i) for i in evaluations_str.strip("[]").split(", ")]
+                grade = sum(evaluations) / len(evaluations)
+                counter += grade
+                counter_student += 1
+            a = counter / counter_student
+            print(f"Средний балл для группы = ", a)
+        else:
+            print("Группа не найдена")
 
     # ЭТО ДЛЯ ВЫХОДА И ПРОДОЛЖЕНИЯ РАБОТЫ С ПРОГРАММОЙ, ДА Я ЗАБЫЛ ОТЖАТЬ CAPS_LOOK
     print("Вы не забыли о своих возможностях?", "\n", "Правила:", "\n",
