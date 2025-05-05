@@ -69,7 +69,7 @@ class DataBas:
             student.info_name(), student.info_surname(), student.info_patronymic(),
             student.info_group(), str(student.info_evaluations())))
         self.connection.commit()
-        print("Student added successfully.")
+        print("Студент был добавлен.")
 
     def view_all_students(self):
         self.cursor.execute("SELECT * FROM student")
@@ -79,6 +79,74 @@ class DataBas:
                 print(student)
         else:
             print("А может гранату бросить? -Так ведь нет никого...")
+
+    def viev_student_and_ball(self,surname):
+        self.cursor.execute("SELECT * FROM student WHERE surname = ?", (surname,))
+        student_data = self.cursor.fetchone()
+        if student_data:
+            name, surname, patronymic, group, evaluations_str = student_data
+            # strip удаляет [], а split разбивает строку на список подстрок, используя указанный разделитель
+            evaluations = [int(i) for i in evaluations_str.strip("[]").split(", ")]  # Преобразование строки в список
+            average_grade = sum(evaluations) / len(evaluations)
+            print("Информация о студенте:", name, surname, patronymic, "Группы: ", group)
+            print("Его оценки: ", evaluations)
+            print("Средний балл: ", average_grade)
+        else:
+            print("Студент с такой фамилией не найден.")
+
+    def edit_student(self,surname):
+        self.cursor.execute("SELECT * FROM student WHERE surname = ?", (surname,))
+        student_data = self.cursor.fetchone()
+        if student_data:
+            name, surname, patronymic, group, evaluations = student_data
+            new_name = input("Введите новое Имя Студента: ")
+            new_surname = input("Введите новую Фамилию Студента: ")
+            new_patronymic = input("Введите новое Отчество Студента: ")
+            new_group = input("Введите новую Группу Студента: ")
+            new_evaluations = []
+            for i in range(4):
+                grade = int(input(f"Введите новую оценку {i + 1}: "))
+                new_evaluations.append(grade)
+            Student1 = Student(new_name, new_surname, new_patronymic, new_group, str(new_evaluations))
+            self.cursor.execute("UPDATE student SET name = ? WHERE name = ?", (Student1.info_name(), name))
+            self.cursor.execute("UPDATE student SET surname = ? WHERE surname = ?",
+                                  (Student1.info_surname(), surname))
+            self.cursor.execute("UPDATE student SET patronymic = ? WHERE patronymic = ?",
+                                  (Student1.info_patronymic(), patronymic))
+            self.cursor.execute("UPDATE student SET 'group' = ? WHERE 'group' = ?", (Student1.info_group(), group))
+            self.cursor.execute("UPDATE student SET evaluations = ? WHERE evaluations = ?",
+                                  (Student1.info_evaluations(), evaluations))
+            # Фиксируем изменения (сохраняем добавление).
+            self.connection.commit()
+        else:
+            print("Студент с такой фамилией не найден.")
+
+    def del_student(self,surname):
+        self.cursor.execute("SELECT * FROM student WHERE surname = ?", (surname,))
+        student_data = self.cursor.fetchone()
+        if student_data:
+            self.cursor.execute("DELETE FROM student WHERE surname=?", (surname,))
+        else:
+            print("Студент с такой фамилией не найден.")
+        self.connection.commit()
+
+    def view_group_average(self,group):
+        # Используйте параметры запроса для защиты от SQL-инъекций и у мменя тут была проблема с \"group\"
+        self.cursor.execute("SELECT evaluations FROM student WHERE \"group\" = ?", (group,))
+        evaluations_mas = self.cursor.fetchall()
+        if evaluations_mas:
+            counter = 0
+            counter_student = 0
+            for evaluations_tuple in evaluations_mas:
+                evaluations_str = evaluations_tuple[0]
+                evaluations = [int(i) for i in evaluations_str.strip("[]").split(", ")]
+                grade = sum(evaluations) / len(evaluations)
+                counter += grade
+                counter_student += 1
+            a = counter / counter_student
+            print(f"Средний балл для группы = ", a)
+        else:
+            print("Группа не найдена")
 
 db_manager = DataBas()
 
@@ -114,13 +182,17 @@ while exit_code != 0:
     elif choice == 2:
         db_manager.view_all_students()
     elif choice == 3:
-        pass
+        surname = input("Введите фамилию студента для поиска: ")
+        db_manager.viev_student_and_ball(surname)
     elif choice == 4:
-        pass
+        surname = input("Введите фамилию студента для редакции: ")
+        db_manager.edit_student(surname)
     elif choice == 5:
-        pass
+        surname = input("Введите фамилию студента для УДАЛЕНИЯ)- ")
+        db_manager.del_student(surname)
     elif choice == 6:
-        pass
+        group = input("Введите группу студентов для узнания ср.бала: ")
+        db_manager.view_group_average(group)
     elif choice == 0:
         break
     else:
