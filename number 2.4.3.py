@@ -81,7 +81,7 @@ while exit_code != 0:
         RAM = psutil.virtual_memory().percent
         print(f"Использование памяти: {RAM}%")
         #psutil.disk_usage() статистика использования диска для раздела
-        # '/' диск C
+        # '/' диск C (Возвращает данные корневого раздела)
         #.percent это процент загрузки
         SSD = psutil.disk_usage('/').percent
         print(f"Использование диска: {SSD}%")
