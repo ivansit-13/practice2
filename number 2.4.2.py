@@ -13,7 +13,9 @@
 # 3.2) Пополнение запасов
 # В приложении должна использоваться база данных для хранения
 # информации.
-
+#
+#!!!!!!!!!!Программа очень чувствительна к правильному написанию текстов!!!!!!!!!!!!!!!!!
+#
 import sqlite3
 
 class DataBas:
@@ -72,12 +74,7 @@ class DataBas:
         self.connection.commit()
 
     def all_drinks(self):
-        self.cursor.execute("SELECT * FROM ingredients")
-        ingredients = self.cursor.fetchall()
-        if ingredients:
-            for j in ingredients:
-                print(j)
-        print("___________________________напитки______________________________")
+        print("_________________________Напитки_________________________")
         self.cursor.execute("SELECT * FROM drinks")
         drinks = self.cursor.fetchall()
         if drinks:
@@ -86,6 +83,49 @@ class DataBas:
         else:
             print("А может гранату бросить? -Так ведь нет никого...")
 
+    def all_ingredients(self):
+        print("________________________Ингредиенты_______________________")
+        self.cursor.execute("SELECT * FROM ingredients")
+        ingredients = self.cursor.fetchall()
+        if ingredients:
+            for j in ingredients:
+                print(j)
+        else:
+            print("А может гранату бросить? -Так ведь нет никого...")
+
+    def all_cocktails(self):
+        print("________________________Коктейли_______________________")
+        self.cursor.execute("SELECT * FROM cocktails")
+        cocktail = self.cursor.fetchall()
+        if cocktail:
+            for j in cocktail:
+                print(j)
+        else:
+            print("А может гранату бросить? -Так ведь нет никого...")
+
+    def sell_drinks(self, choice_drinks,name,quantity):
+        self.cursor.execute(f"SELECT quantity FROM {choice_drinks} WHERE name=?", (name,))
+        row = self.cursor.fetchone()
+        if row:
+            current_quantity = row[0]
+            if current_quantity >= quantity:
+                new_quantity = current_quantity - quantity
+                self.cursor.execute(f"UPDATE {choice_drinks} SET quantity=? WHERE name=?", (new_quantity, name))
+                self.connection.commit()
+        else:
+            print("Или вам не хватает или такого продукта у нас нет(")
+
+    def add_drinks(self, choice_drinks,name,quantity):
+        self.cursor.execute(f"SELECT quantity FROM {choice_drinks} WHERE name=?", (name,))
+        row = self.cursor.fetchone()
+        if row:
+            current_quantity = row[0]
+            if current_quantity >= quantity:
+                new_quantity = current_quantity + quantity
+                self.cursor.execute(f"UPDATE {choice_drinks} SET quantity=? WHERE name=?", (new_quantity, name))
+                self.connection.commit()
+        else:
+            print("Такого продукта у нас нет(")
 
 
 
@@ -114,13 +154,13 @@ while exit_code != 0:
     choice = int(input("Вы выбрали: "))
     if choice == 1:
         name = input("Введите название ингредиента: ")
-        quantity = input("Введите количество ингредиента: ")
-        unit = input("Введите измерительную величину ингредиента: ")
+        quantity = input("Введите количество ингредиента в  миллилитрах: ")
+        unit = "мил."
         ILD_manadger.add_ingredients(name,quantity, unit)
     elif choice == 2:
         name = input("Введите название напитка: ")
-        quantity = input("Введите количество напитка: ")
-        unit = input("Введите измерительную величину напитка: ")
+        quantity = input("Введите количество напитка в миллилитрах: ")
+        unit = "мил."
         alcohol_strength_n = 10
         for key, value in alcohol_strength.items():
             if name == key:
@@ -128,6 +168,8 @@ while exit_code != 0:
                 ILD_manadger.add_drink(name, alcohol_strength_n, quantity, unit)
                 break
     elif choice == 3:
+        # Крепость коктейля можно вычислить по формуле: ABV
+        # коктейля = ∑(Объём каждого алкогольного ингредиента × Крепость ингредиента) / Общий объём коктейля × 100.
         quantity_volume = 0
         alcohol_strength_volume = 0
         name = input("Введите название коктейля: ")
@@ -137,9 +179,8 @@ while exit_code != 0:
         while True:
             alcohol_strength_n = 0
             print("Вот список имеющихся ингредиентов и алкогольных напитков")
-            print("___________________________ингредиенты______________________________")
             ILD_manadger.all_drinks()
-            print("_________________________________________________________")
+            ILD_manadger.all_ingredients()
             ing_name = input("Ингредиент что вы хотите добавить: ")
             for key, value in alcohol_strength.items():
                 if ing_name == key:
@@ -149,10 +190,55 @@ while exit_code != 0:
                 break
             amount = float(input("Количество(миллилитры): "))
             quantity_volume += amount
-            alcohol_strength_volume += alcohol_strength_n * amount
+            alcohol_strength_volume += amount * alcohol_strength_n
             structure.append((ing_name, amount))
         alcohol_strength_cocktail = alcohol_strength_volume/quantity_volume
         ILD_manadger.add_cocktail(name, str(structure),alcohol_strength_cocktail, price)
+    elif choice == 4:
+        print("Что вы хотите продать:")
+        print("1 - ингредиент")
+        print("2 - напиток")
+        print("3 - коктейль")
+        choice_drinks = int(input("Ваш выбор - "))
+        if choice_drinks == 1:
+            choice_drinks = "ingredients"
+            ILD_manadger.all_ingredients()
+        elif choice_drinks == 2:
+            choice_drinks = "drinks"
+            ILD_manadger.all_drinks()
+        elif choice_drinks ==3:
+            choice_drinks = "cocktails"
+            ILD_manadger.all_cocktails()
+        else:
+            print("Не правильно, попробуйте ещё раз")
+        name = input("Название: ")
+        quantity = float(input("Количество: "))
+        ILD_manadger.sell_drinks(choice_drinks,name,quantity)
+    elif choice == 5:
+        ILD_manadger.all_ingredients()
+        ILD_manadger.all_drinks()
+        ILD_manadger.all_cocktails()
+        print("_________________________________________________________")
+    elif choice == 6:
+        print("Что вы хотите пополнить:")
+        print("1 - ингредиент")
+        print("2 - напиток")
+        print("3 - коктейль")
+        choice_drinks = int(input("Ваш выбор - "))
+        if choice_drinks == 1:
+            choice_drinks = "ingredients"
+            ILD_manadger.all_ingredients()
+        elif choice_drinks == 2:
+            choice_drinks = "drinks"
+            ILD_manadger.all_drinks()
+        elif choice_drinks == 3:
+            choice_drinks = "cocktails"
+            ILD_manadger.all_cocktails()
+        else:
+            print("Не правильно, попробуйте ещё раз")
+        name = input("Название: ")
+        quantity = float(input("Количество: "))
+        ILD_manadger.add_drinks(choice_drinks, name, quantity)
     elif choice == 0:
         break
     else:
