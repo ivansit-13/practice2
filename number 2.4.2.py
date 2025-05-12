@@ -77,6 +77,7 @@ class DataBas:
         if ingredients:
             for j in ingredients:
                 print(j)
+        print("___________________________напитки______________________________")
         self.cursor.execute("SELECT * FROM drinks")
         drinks = self.cursor.fetchall()
         if drinks:
@@ -134,14 +135,24 @@ while exit_code != 0:
         print("Введите состав коктейля. Для завершения введите 'стоп'.")
         structure = []
         while True:
-            print("Вот список имеющихся штук")
+            alcohol_strength_n = 0
+            print("Вот список имеющихся ингредиентов и алкогольных напитков")
+            print("___________________________ингредиенты______________________________")
             ILD_manadger.all_drinks()
-            ing_name = input("Ингредиент: ")
+            print("_________________________________________________________")
+            ing_name = input("Ингредиент что вы хотите добавить: ")
+            for key, value in alcohol_strength.items():
+                if ing_name == key:
+                    alcohol_strength_n = alcohol_strength[key]
+                    break
             if ing_name.lower() == 'стоп':
                 break
-            amount = float(input("Количество: "))
+            amount = float(input("Количество(миллилитры): "))
+            quantity_volume += amount
+            alcohol_strength_volume += alcohol_strength_n * amount
             structure.append((ing_name, amount))
-        ILD_manadger.add_cocktail(name, structure,alcohol_strength, price)
+        alcohol_strength_cocktail = alcohol_strength_volume/quantity_volume
+        ILD_manadger.add_cocktail(name, str(structure),alcohol_strength_cocktail, price)
     elif choice == 0:
         break
     else:
