@@ -51,6 +51,11 @@ class DataBas:
             alcohol_strength REAL,
             price REAL
         )""")
+        self.cursor.execute(""" CREATE TABLE IF NOT EXISTS sell (
+            name TEXT UNIQUE,
+            choice_drinks TEXT,
+            quantity INTEGER
+        )""")
         self.connection.commit()
 
     def close(self):
@@ -103,29 +108,42 @@ class DataBas:
         else:
             print("А может гранату бросить? -Так ведь нет никого...")
 
-    def sell_drinks(self, choice_drinks,name,quantity):
-        self.cursor.execute(f"SELECT quantity FROM {choice_drinks} WHERE name=?", (name,))
-        row = self.cursor.fetchone()
-        if row:
-            current_quantity = row[0]
-            if current_quantity >= quantity:
-                new_quantity = current_quantity - quantity
-                self.cursor.execute(f"UPDATE {choice_drinks} SET quantity=? WHERE name=?", (new_quantity, name))
-                self.connection.commit()
-        else:
-            print("Или вам не хватает или такого продукта у нас нет(")
 
-    def add_drinks(self, choice_drinks,name,quantity):
+    def add_drinks_remove(self, choice_drinks,name,quantity, no):
         self.cursor.execute(f"SELECT quantity FROM {choice_drinks} WHERE name=?", (name,))
         row = self.cursor.fetchone()
-        if row:
-            current_quantity = row[0]
-            if current_quantity >= quantity:
-                new_quantity = current_quantity + quantity
-                self.cursor.execute(f"UPDATE {choice_drinks} SET quantity=? WHERE name=?", (new_quantity, name))
-                self.connection.commit()
+        if no == 4:
+            if row:
+                current_quantity = row[0]
+                if current_quantity >= quantity:
+                    new_quantity = current_quantity - quantity
+                    self.cursor.execute(f"UPDATE {choice_drinks} SET quantity=? WHERE name=?", (new_quantity, name))
+                    self.connection.commit()
+        elif no == 6:
+            if row:
+                current_quantity = row[0]
+                if current_quantity >= quantity:
+                    new_quantity = current_quantity + quantity
+                    self.cursor.execute(f"UPDATE {choice_drinks} SET quantity=? WHERE name=?", (new_quantity, name))
+                    self.connection.commit()
         else:
             print("Такого продукта у нас нет(")
+
+    def sell(self,name,quantity, choice_drinks):
+        self.cursor.execute("""
+                INSERT OR REPLACE INTO sell (name,choice_drinks, quantity) VALUES (?, ?, ?)""", (name,choice_drinks, quantity))
+        self.connection.commit()
+    def info_sell(self):
+        print("_______________________Продажи_______________________")
+        self.cursor.execute("SELECT * FROM sell")
+        sell = self.cursor.fetchall()
+        if sell:
+            for j in sell:
+                print(j)
+        else:
+            print("А может гранату бросить? -Так ведь нет никого...")
+
+
 
 
 
@@ -146,9 +164,11 @@ while exit_code != 0:
     print("1 - Добавить ингредиент")
     print("2 - Добавить напиток")
     print("3 - Создать коктейль")
-    print("4 - Продать товар")
+    print("4 - Под убавить товар")
     print("5 - Посмотреть остатки")
     print("6 - Пополнить запасы")
+    print("7 - Продать товар")
+    print("8 - Просмотр чего и сколько было проданной")
     print("0 - Выйти")
 
     choice = int(input("Вы выбрали: "))
@@ -195,10 +215,9 @@ while exit_code != 0:
         alcohol_strength_cocktail = alcohol_strength_volume/quantity_volume
         ILD_manadger.add_cocktail(name, str(structure),alcohol_strength_cocktail, price)
     elif choice == 4:
-        print("Что вы хотите продать:")
+        print("Что вы хотите подубавить:")
         print("1 - ингредиент")
         print("2 - напиток")
-        print("3 - коктейль")
         choice_drinks = int(input("Ваш выбор - "))
         if choice_drinks == 1:
             choice_drinks = "ingredients"
@@ -206,14 +225,11 @@ while exit_code != 0:
         elif choice_drinks == 2:
             choice_drinks = "drinks"
             ILD_manadger.all_drinks()
-        elif choice_drinks ==3:
-            choice_drinks = "cocktails"
-            ILD_manadger.all_cocktails()
         else:
             print("Не правильно, попробуйте ещё раз")
         name = input("Название: ")
         quantity = float(input("Количество: "))
-        ILD_manadger.sell_drinks(choice_drinks,name,quantity)
+        ILD_manadger.add_drinks_remove(choice_drinks,name,quantity,choice)
     elif choice == 5:
         ILD_manadger.all_ingredients()
         ILD_manadger.all_drinks()
@@ -221,6 +237,22 @@ while exit_code != 0:
         print("_________________________________________________________")
     elif choice == 6:
         print("Что вы хотите пополнить:")
+        print("1 - ингредиент")
+        print("2 - напиток")
+        choice_drinks = int(input("Ваш выбор - "))
+        if choice_drinks == 1:
+            choice_drinks = "ingredients"
+            ILD_manadger.all_ingredients()
+        elif choice_drinks == 2:
+            choice_drinks = "drinks"
+            ILD_manadger.all_drinks()
+        else:
+            print("Не правильно, попробуйте ещё раз")
+        name = input("Название: ")
+        quantity = float(input("Количество: "))
+        ILD_manadger.add_drinks_remove(choice_drinks, name, quantity,choice)
+    elif choice == 7:
+        print("Что вы хотите купить:")
         print("1 - ингредиент")
         print("2 - напиток")
         print("3 - коктейль")
@@ -236,9 +268,11 @@ while exit_code != 0:
             ILD_manadger.all_cocktails()
         else:
             print("Не правильно, попробуйте ещё раз")
-        name = input("Название: ")
-        quantity = float(input("Количество: "))
-        ILD_manadger.add_drinks(choice_drinks, name, quantity)
+        name = input("Введите что вы хотите купить - ")
+        quantity = int(input("Введите сколько вы хотите купить штук - "))
+        ILD_manadger.sell(name,quantity,choice_drinks)
+    elif choice == 8:
+        ILD_manadger.info_sell()
     elif choice == 0:
         break
     else:
