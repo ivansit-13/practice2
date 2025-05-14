@@ -14,7 +14,12 @@ def get_dog_image_url():
 def get_cat_image_url():
     response = rq.get("http://api.thecatapi.com/v1/images/search").text
     return json.loads(response)[0]["url"]
-
+def get_Warhammer():
+    response = rq.get('https://api-warhammer40k.onrender.com/quote')
+    return response.json()
+def get_Warhammer2():
+    response = rq.get('https://api-warhammer40k.onrender.com/image')
+    return response.json()
 
 # Словарь для хранения URL анимаций
 n = {
@@ -25,6 +30,8 @@ n = {
     5: "https://media.tenor.com/DckqsVCpt-0AAAAM/warhammer40k-ultramarines.gif",
     6: "https://itunes.apple.com/app/apple-store/id917932200?pt=39040802&ct=Media1GIFV2&mt=8"
 }
+
+
 
 # Токен для подключения к Telegram Bot API
 token = "7763616222:AAFDk265dnu7WGrZW4xBG8wKLfK6F_4IRj8"
@@ -37,6 +44,7 @@ keyworld.row("ЗА ИМПЕРАТОРА!")
 keyworld.row("СТОПкнопка.")
 keyworld.row("ХОЧУ СОБАЧКУ!")
 keyworld.row("ДенсимЧуваки")
+keyworld.row("Да!")
 
 last_message_time0 = {}
 
@@ -94,6 +102,9 @@ def handle_message(message):
         bot.send_animation(message.chat.id, n[3])
     if message.text == "ДенсимЧуваки" and can_send_message2(message.chat.id):
         bot.send_animation(message.chat.id, n[random.randint(4, 6)])
+    if message.text == "Дa!":
+        bot.send_message(message.chat_id, get_Warhammer['quote'])
+        bot.send_photo(message.chat_id, photo=get_Warhammer2['image'])
 
     print(message)  # Вывод информации о сообщении в консоль
 

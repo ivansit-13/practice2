@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-
+import os
 app = Flask(__name__)
 
 # Ваши цитаты и изображения
@@ -35,5 +35,5 @@ def get_random_image():
     import random
     return jsonify({"image": random.choice(images)})
 
-
-app.run(debug=True)
+port = int(os.environ.get("PORT", 5000))
+app.run(host='0.0.0.0', port=port)
