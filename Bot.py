@@ -44,7 +44,8 @@ keyworld.row("ЗА ИМПЕРАТОРА!")
 keyworld.row("СТОПкнопка.")
 keyworld.row("ХОЧУ СОБАЧКУ!")
 keyworld.row("ДенсимЧуваки")
-keyworld.row("Да!")
+keyworld.row("Дa!")
+keyworld.row("Нет!")
 
 last_message_time0 = {}
 
@@ -103,8 +104,13 @@ def handle_message(message):
     if message.text == "ДенсимЧуваки" and can_send_message2(message.chat.id):
         bot.send_animation(message.chat.id, n[random.randint(4, 6)])
     if message.text == "Дa!":
-        bot.send_message(message.chat_id, get_Warhammer['quote'])
-        bot.send_photo(message.chat_id, photo=get_Warhammer2['image'])
+        warhammer_quote = get_Warhammer()
+        print("!!!!!!!!!!!!!!!!!!!!!")
+        print(warhammer_quote)
+        bot.send_message(message.chat.id, warhammer_quote.get('quote', 'Нет цитаты'))
+    if message.text == "Нет!":
+        warhammer_image = get_Warhammer2()
+        bot.send_photo(message.chat.id, photo=warhammer_image.get('image', ''))
 
     print(message)  # Вывод информации о сообщении в консоль
 
