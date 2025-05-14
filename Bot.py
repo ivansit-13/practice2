@@ -38,7 +38,7 @@ n = {
 
 
 # Токен для подключения к Telegram Bot API
-token = "находится у меня в отдельном файле не в гиде(мудл)"
+token = "мудл"
 bot = telebot.TeleBot(token)
 
 # Создание клавиатуры для взаимодействия с пользователем
@@ -117,7 +117,7 @@ def handle_message(message):
         curs = curs['rates']
         dollar_rate = curs.get('USD', 'Недоступно')
         euro_rate = curs.get('EUR', 'Недоступно')
-        bot.send_message(message.chat.id, print(f"Курс рубля:\n1 USD = {dollar_rate} RUB\n1 EUR = {euro_rate} RUB"))
+        bot.send_message(message.chat.id, f"Курс рубля:\n1 USD = {dollar_rate} RUB\n1 EUR = {euro_rate} RUB")
 
     print(message)  # Вывод информации о сообщении в консоль
 
