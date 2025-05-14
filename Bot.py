@@ -20,6 +20,10 @@ def get_Warhammer():
 def get_Warhammer2():
     response = rq.get('https://api-warhammer40k.onrender.com/image')
     return response.json()
+def Currency():
+    url = 'https://api.exchangerate-api.com/v4/latest/RUB'
+    response = rq.get(url)
+    return response.json()
 
 # Словарь для хранения URL анимаций
 n = {
@@ -34,18 +38,19 @@ n = {
 
 
 # Токен для подключения к Telegram Bot API
-token = "7763616222:AAFDk265dnu7WGrZW4xBG8wKLfK6F_4IRj8"
+token = "находится у меня в отдельном файле не в гиде(мудл)"
 bot = telebot.TeleBot(token)
 
 # Создание клавиатуры для взаимодействия с пользователем
 keyworld = telebot.types.ReplyKeyboardMarkup()
 keyworld.row("ДАЙ МНЕ КОТИКОВ!!")
 keyworld.row("ЗА ИМПЕРАТОРА!")
-keyworld.row("СТОПкнопка.")
+keyworld.row("Ответ на всё.")
 keyworld.row("ХОЧУ СОБАЧКУ!")
 keyworld.row("ДенсимЧуваки")
 keyworld.row("Дa!")
-keyworld.row("Нет!")
+keyworld.row("дай картинку!")
+keyworld.row("Курс Рубля")
 
 last_message_time0 = {}
 
@@ -60,7 +65,6 @@ def can_send_message1(user_id):
     else:
         return False
 
-last_time1 = {}
 
 last_message_time1 = {}
 
@@ -75,7 +79,6 @@ def can_send_message2(user_id):
     else:
         return False
 
-last_time2 = {}
 
 @bot.message_handler(commands=['start', 'help'])
 def welcome(message):
@@ -99,18 +102,22 @@ def handle_message(message):
             bot.send_message(message.chat.id, "не спамь!жди 3 секунды")
     if message.text == "ЗА ИМПЕРАТОРА!" and can_send_message1(message.chat.id):
         bot.send_animation(message.chat.id, n[random.randint(1, 2)])
-    if message.text == "СТОПкнопка." and can_send_message2(message.chat.id):
+    if message.text == "Ответ на всё." and can_send_message2(message.chat.id):
         bot.send_animation(message.chat.id, n[3])
     if message.text == "ДенсимЧуваки" and can_send_message2(message.chat.id):
         bot.send_animation(message.chat.id, n[random.randint(4, 6)])
     if message.text == "Дa!":
         warhammer_quote = get_Warhammer()
-        print("!!!!!!!!!!!!!!!!!!!!!")
-        print(warhammer_quote)
         bot.send_message(message.chat.id, warhammer_quote.get('quote', 'Нет цитаты'))
-    if message.text == "Нет!":
+    if message.text == "дай картинку!":
         warhammer_image = get_Warhammer2()
         bot.send_photo(message.chat.id, photo=warhammer_image.get('image', ''))
+    if message.text == "Курс Рубля":
+        curs = Currency()
+        curs = curs['rates']
+        dollar_rate = curs.get('USD', 'Недоступно')
+        euro_rate = curs.get('EUR', 'Недоступно')
+        bot.send_message(message.chat.id, print(f"Курс рубля:\n1 USD = {dollar_rate} RUB\n1 EUR = {euro_rate} RUB"))
 
     print(message)  # Вывод информации о сообщении в консоль
 

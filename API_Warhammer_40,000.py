@@ -14,16 +14,12 @@ quotes = [
 images = [
     "https://i.pinimg.com/736x/66/00/42/6600425268f7f7bb5c269bdc78e1a1f4.jpg",
     "https://i.pinimg.com/736x/5c/52/8b/5c528ba1f67b082ddcd9eec4451e2205.jpg",
-    "https://i.pinimg.com/736x/e6/9a/5e/e69a5e48ea77c6767a73396af63cdd46.jpg"
+    "https://i.pinimg.com/736x/e6/9a/5e/e69a5e48ea77c6767a73396af63cdd46.jpg",
+    "https://i.pinimg.com/736x/e8/fb/de/e8fbde6b454251d719a6aff9c71c7646.jpg",
+    "https://i.pinimg.com/originals/b4/39/2e/b4392ed00577cb8c94a3178d6008be72.gif",
+    "https://i.pinimg.com/736x/37/c4/ee/37c4eef61bb27e06181afe5922769549.jpg",
+    "https://i.pinimg.com/736x/42/0e/bb/420ebb91e5c51bf5cfb57a199d87f495.jpg"
 ]
-
-@app.route('/quotes', methods=['GET'])
-def get_quotes():
-    return jsonify(quotes)
-
-@app.route('/images', methods=['GET'])
-def get_images():
-    return jsonify(images)
 
 @app.route('/quote', methods=['GET'])
 def get_random_quote():
@@ -35,5 +31,5 @@ def get_random_image():
     import random
     return jsonify({"image": random.choice(images)})
 
-port = int(os.environ.get("PORT", 5000))
-app.run(host='0.0.0.0', port=port)
+
+app.run(debug=True)
