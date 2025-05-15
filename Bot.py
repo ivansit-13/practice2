@@ -49,7 +49,7 @@ cities = [
 
 
 # Токен для подключения к Telegram Bot API
-token = "Мудл"
+token = "7996171171:AAFpxLrNLmdW5ZslYP1TvB-zA4hEIwaGo3w"
 bot = telebot.TeleBot(token)
 
 # Создание клавиатуры для взаимодействия с пользователем
@@ -136,7 +136,7 @@ def handle_message(message):
         curs = curs['rates']
         RUB_rate = curs.get('RUB', 'Недоступно')
         euro_rate = curs.get('EUR', 'Недоступно')
-        bot.send_message(message.chat.id, f"Курс доллара:\n1 RUB = {RUB_rate} RUB\n1 EUR = {euro_rate} USD")
+        bot.send_message(message.chat.id, f"Курс доллара:\n1 RUB = {RUB_rate} USD\n1 EUR = {euro_rate} USD")
     if message.text == "Покажи город" and can_send_message1(message.chat.id):
         city = get_random_city()
         bot.send_message(message.chat.id, f"Ваш случайный город: {city}")
