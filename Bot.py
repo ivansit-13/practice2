@@ -20,8 +20,12 @@ def get_Warhammer():
 def get_Warhammer2():
     response = rq.get('https://api-warhammer40k.onrender.com/image')
     return response.json()
-def Currency():
+def CurrencyRu():
     url = 'https://api.exchangerate-api.com/v4/latest/RUB'
+    response = rq.get(url)
+    return response.json()
+def CurrencyUSD():
+    url = 'https://api.exchangerate-api.com/v4/latest/USD'
     response = rq.get(url)
     return response.json()
 
@@ -38,7 +42,7 @@ n = {
 
 
 # Токен для подключения к Telegram Bot API
-token = "мудл"
+token = "Мудл"
 bot = telebot.TeleBot(token)
 
 # Создание клавиатуры для взаимодействия с пользователем
@@ -51,6 +55,7 @@ keyworld.row("ДенсимЧуваки")
 keyworld.row("Дa!")
 keyworld.row("дай картинку!")
 keyworld.row("Курс Рубля")
+keyworld.row("Курс Доллара")
 
 last_message_time0 = {}
 
@@ -113,11 +118,17 @@ def handle_message(message):
         warhammer_image = get_Warhammer2()
         bot.send_photo(message.chat.id, photo=warhammer_image.get('image', ''))
     if message.text == "Курс Рубля":
-        curs = Currency()
+        curs = CurrencyRu()
         curs = curs['rates']
         dollar_rate = curs.get('USD', 'Недоступно')
         euro_rate = curs.get('EUR', 'Недоступно')
         bot.send_message(message.chat.id, f"Курс рубля:\n1 USD = {dollar_rate} RUB\n1 EUR = {euro_rate} RUB")
+    if message.text == "Курс Доллара":
+        curs = CurrencyUSD()
+        curs = curs['rates']
+        RUB_rate = curs.get('RUB', 'Недоступно')
+        euro_rate = curs.get('EUR', 'Недоступно')
+        bot.send_message(message.chat.id, f"Курс доллара:\n1 RUB = {RUB_rate} RUB\n1 EUR = {euro_rate} USD")
 
     print(message)  # Вывод информации о сообщении в консоль
 
