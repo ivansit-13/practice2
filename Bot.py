@@ -28,6 +28,8 @@ def CurrencyUSD():
     url = 'https://api.exchangerate-api.com/v4/latest/USD'
     response = rq.get(url)
     return response.json()
+def get_random_city():
+    return random.choice(cities)
 
 # Словарь для хранения URL анимаций
 n = {
@@ -38,7 +40,12 @@ n = {
     5: "https://media.tenor.com/DckqsVCpt-0AAAAM/warhammer40k-ultramarines.gif",
     6: "https://itunes.apple.com/app/apple-store/id917932200?pt=39040802&ct=Media1GIFV2&mt=8"
 }
-
+cities = [
+    "Москва", "Санкт-Петербург", "Новосибирск", "Екатеринбург", "Казань",
+    "Ростов-на-Дону", "Нижний Новгород", "Челябинск", "Самара", "Уфа",
+    "Воронеж", "Пермь", "Краснодар", "Волгоград", "Саратов",
+    "Красноярск", "Тюмень", "Тольятти", "Ижевск", "Барнаул"
+]
 
 
 # Токен для подключения к Telegram Bot API
@@ -56,6 +63,7 @@ keyworld.row("Дa!")
 keyworld.row("дай картинку!")
 keyworld.row("Курс Рубля")
 keyworld.row("Курс Доллара")
+keyworld.row("Покажи город")
 
 last_message_time0 = {}
 
@@ -129,6 +137,9 @@ def handle_message(message):
         RUB_rate = curs.get('RUB', 'Недоступно')
         euro_rate = curs.get('EUR', 'Недоступно')
         bot.send_message(message.chat.id, f"Курс доллара:\n1 RUB = {RUB_rate} RUB\n1 EUR = {euro_rate} USD")
+    if message.text == "Покажи город" and can_send_message1(message.chat.id):
+        city = get_random_city()
+        bot.send_message(message.chat.id, f"Ваш случайный город: {city}")
 
     print(message)  # Вывод информации о сообщении в консоль
 
